@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영화 웹페이지</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+        }
+        .poster-img {
+            width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>안녕하세요 전서준입니다.</h1>
+    
+    <h4>다음은 제가 영화를 볼 때 자주 방문하는 웹페이지들 입니다. 해당 사이트들을 누르면 접속 가능합니다.</h4>
+    
+    <ul>
+        <li><a href="https://www.imdb.com">IMDB</a></li>
+        <li><a href="https://www.netflix.com">Netflix</a></li>
+    </ul>
+    
+    <table>
+        <caption>표1. Top3 영화</caption>
+        <thead>
+            <tr>
+                <th rowspan="2">순위</th>
+                <th colspan="3">영화 정보</th>
+            </tr>
+            <tr>
+                <th>제목</th>
+                <th>포스터</th>
+                <th>명대사</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Titanic</td>
+                <td><img src="titanic.jpg" alt="Titanic Poster" class="poster-img" width="150" height="300"></td>
+                <td>Nothing on Earth could come between them.</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Forrest Gump</td>
+                <td><img src="forrestgump.jpg" alt="Forrest Gump Poster" class="poster-img" width="150" height="300"></td>
+                <td>The world will never be the same, once you've seen it through the eyes of Forrest Gump.</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Mamma Mia!</td>
+                <td><img src="mammamia.jpg" alt="Mamma Mia Poster" class="poster-img" width="150" height="300"></td>
+                <td>Take a trip down the aisle you'll never forget</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
