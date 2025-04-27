@@ -1,0 +1,383 @@
+body {
+    width: 100%;
+    max-width: 1020px;
+    margin: 0 auto;
+}
+
+.top-header {
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.header-text {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 25px;
+    animation-name: header-keyframe;
+    animation-duration: 2s;
+    animation-timing-function: ease-out;
+}
+
+@keyframes header-keyframe {
+    0% { transform: translateX(1020px); }
+    100% { transform: translateX(0px); }
+}
+
+.navigation-bar {
+    margin-top: 6px;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.nav-link {
+    margin-right: 20px;
+    text-decoration: none;
+    font-size: 15px;
+    color: black;
+    padding: 6px;
+}
+
+.nav-link.active {
+    border-top: 2px solid red;
+    border-bottom: 2px solid red;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-section {
+    display: flex;
+}
+
+.about-section {
+    margin-bottom: 20px;
+}
+
+@media screen and (max-width: 480px) {
+
+    body {
+        width: 100%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .navigation-bar {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .link {
+        flex-direction: column;
+        align-items: center;
+        margin: auto;
+    }
+
+    .movie-text {
+        text-align: center;
+    }
+
+    .movie-section {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .movie-box {
+        width: 80%;
+        margin-bottom: 20px;
+    }
+
+    .about-section h3 {
+        text-align: center;
+    }
+}
+
+@media screen and (min-width: 481px) and (max-width: 800px) {
+
+    body {
+        width: 100%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .navigation-bar {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .link {
+        flex-direction: column;
+        align-items: center;
+        margin: auto;
+    }
+
+    .movie-text {
+        text-align: center;
+    }
+    
+    .movie-section {
+        flex-wrap: wrap;
+        justify-content: center;
+        column-gap: 20px;
+    }
+
+    .movie-box {
+        width: 45%;
+        margin-bottom: 20px;
+    }
+
+    .about-section h3 {
+        text-align: center;
+    }
+}
+
+@media screen and (min-width: 801px) {
+
+    .link {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .movie-section {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .movie-box {
+        width: 23%;
+        margin-bottom: 20px;
+    }
+
+    .about {
+        column-count: 2;
+        column-gap: 30px;
+        column-rule: 1px outset black;
+    }
+}
+
+
+.movie-box {
+    border: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.poster {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40%;
+    margin-top: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 2s;
+}
+
+.poster img {
+    width: 100%;
+    height: 100%;
+    margin-bottom: 10px;
+}
+
+.movie-title {
+    color: white;
+    font-weight: bold;
+    position: absolute;
+    padding: 5px 10px;
+    display: none
+}
+
+.poster:hover{
+    transform: scale(1.2);
+    z-index: 100;
+}
+
+.poster:hover .movie-title {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 100%;
+    text-align: center;
+    display: block;
+}
+
+
+form {
+    border: 2px solid black;
+    width: 300px;
+    margin: auto;
+    padding: 10px;
+}
+
+.signup {
+    height: 350px;
+}
+
+.login {
+    height: 150px;
+}
+
+form label {
+    display: inline-block;
+    margin:  5px 0;
+}
+
+form label span {
+    display: inline-block;
+    width: 100px;
+}
+
+input:not([type="radio"], [type="submit"], [type="reset"]), select {
+    width: 150px;
+}
+
+.submit {
+    background-color: lightgreen;
+    border: 1px lightgreen;
+    border-radius: 3px;
+    font-size: 15px;
+    width: 70px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.reset {
+    background-color: red;
+    color: white;
+    border: 1px red;
+    border-radius: 3px;
+    font-size: 15px;
+    width: 70px;
+    height: 24px;
+}
+
+.submitDiv {
+    margin-top: 15px;
+}
+
+.navigation {
+    margin: 15px 0;
+    font-size: 18px;
+    text-align: center;
+}
+
+.navigation a {
+    color: blue;
+    text-decoration: none;
+}
+
+.navigation a:hover {
+    text-decoration: underline;
+}
+
+.current {
+    color: #000;
+}
+
+.signup-form, .login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.form-container {
+    width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    align-items: center;
+}
+
+.form-group {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    text-align: left;
+}
+
+.form-group label {
+    width: 100px;
+    font-weight: normal;
+    text-align: center;
+    margin-right: 20px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="number"],
+select {
+    width: 300px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.radio-group {
+    display: flex;
+    align-items: center;
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 5px;
+}
+
+.radio-group label {
+    width: auto;
+    margin-right: 20px;
+}
+
+.buttons {
+    margin-top: 20px;
+    text-align: center;
+}
+
+button {
+    padding: 8px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+}
+
+.btn-signup, .btn-login {
+    background-color: #90ee90;
+    color: black;
+}
+
+.btn-cancel {
+    background-color: #ff0000;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #6495ed;
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+h1 {
+    color: #000;
+    font-size: 28px;
+    margin: 20px 0;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
