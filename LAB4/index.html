@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1020">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <title>Movie Site</title>
+</head>
+
+<body>
+  <header class="top-header">
+    <div class="header-text">인프밍 영화 정보 사이트입니다.</div>
+    <nav class="navigation-bar">
+        <a href="index.html" class="nav-link active">메인페이지</a>
+        <a href="login.html" class="nav-link">로그인</a>
+        <a href="signup.html" class="nav-link">회원가입</a>
+    </nav>
+  </header>
+  <hr class="indicator-line">
+  <div class="container">
+    <div class="search-bar-row">
+      <form id="movie-search-form" style="border:none;background:none;box-shadow:none;padding:0;margin:0;">
+        <input id="movie-search-input" type="text" placeholder="키워드를 입력하세요." />
+        <button id="movie-search-btn" type="submit">Filter results</button>
+      </form>
+    </div>
+    <div class="main-content-row">
+      <aside class="sidebar">
+        <div style="border:1px solid #aaa; border-radius:6px; padding:18px 16px; background:#fafafa;">
+          <div style="font-weight:bold; margin-bottom:10px;">정렬 기준</div>
+          <div style="margin-bottom:8px;"><input class="sort-radio" type="radio" name="sort-movie" id="sort-movie1" value="grade-desc"><label for="sort-movie1"> 평점 내림차순</label></div>
+          <div style="margin-bottom:8px;"><input class="sort-radio" type="radio" name="sort-movie" id="sort-movie2" value="grade-asc"><label for="sort-movie2"> 평점 오름차순</label></div>
+          <div style="margin-bottom:8px;"><input class="sort-radio" type="radio" name="sort-movie" id="sort-movie3" value="date-desc"><label for="sort-movie3"> 개봉 내림차순</label></div>
+          <div><input class="sort-radio" type="radio" name="sort-movie" id="sort-movie4" value="date-asc"><label for="sort-movie4"> 개봉 오름차순</label></div>
+        </div>
+      </aside>
+      <main style="flex:1;">
+        <h2 style="margin-bottom:16px;">Movies</h2>
+        <div id="movie-list" class="movie-list">
+        </div>
+      </main>
+    </div>
+    <div class="about-section" style="margin-top:40px;">
+      <h3>About</h3>
+      <hr>
+      <div class="about">여기는 인프밍 영화정보 사이트!<br>영화 정보, 검색, 정렬, 필터링 기능을 제공합니다.</div>
+    </div>
+  </div>
+  <script>
+    let movieData = [];
+    let filteredData = [];
+    let loadedCount = 0;
+    const BATCH_SIZE = 6;
+    let searchTerm = '';
+    let sortType = 'grade-desc';
+    let isLoading = false;
+
+    async function loadMoviesFromJson() {
+      try {
+        const response = await fetch('product.json');
+        const movies = await response.json();
+        movieData = movies.map(m => ({ ...m, grade: parseFloat(m.grade) }));
+        applyFiltersAndRender(true);
+      } catch (err) {
+        document.getElementById('movie-list').innerHTML = '<div>영화 데이터를 불러올 수 없습니다.</div>';
+      }
+    }
+
+    function applyFiltersAndRender(reset = false) {
+      let result = movieData.filter(m => m.title.toLowerCase().includes(searchTerm.toLowerCase()));
+      switch (sortType) {
+        case 'grade-desc':
+          result.sort((a, b) => b.grade - a.grade); break;
+        case 'grade-asc':
+          result.sort((a, b) => a.grade - b.grade); break;
+        case 'date-desc':
+          result.sort((a, b) => new Date(b.date) - new Date(a.date)); break;
+        case 'date-asc':
+          result.sort((a, b) => new Date(a.date) - new Date(b.date)); break;
+      }
+      filteredData = result;
+      if (reset) loadedCount = 0;
+      renderMovieCards(reset);
+    }
+
+    function renderMovieCards(reset = false) {
+      const container = document.getElementById('movie-list');
+      if (reset) container.innerHTML = '';
+      const nextBatch = filteredData.slice(loadedCount, loadedCount + BATCH_SIZE);
+      nextBatch.forEach(movie => {
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.innerHTML = `
+          <div class="poster" style="position:relative; width:100%; height:320px;">
+            <img src="${movie.image}" alt="${movie.title}" style="width:100%; height:100%; object-fit:cover; display:block;">
+            <div class="movie-hover" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); color:#fff; padding:16px; box-sizing:border-box; font-size:14px; overflow:auto;">줄거리: ${movie.description}</div>
+          </div>
+          <div style="padding:12px 10px 10px 10px;">
+            <div style="font-weight:bold; font-size:18px;">${movie.title}</div>
+            <div style="color:#555; font-size:14px; margin:4px 0 2px 0;">📅 ${movie.date}</div>
+            <div style="color:#f5b50a; font-size:14px;">⭐ ${movie.grade}/10</div>
+          </div>
+        `;
+        const posterDiv = card.querySelector('.poster');
+        const hoverDiv = card.querySelector('.movie-hover');
+        posterDiv.addEventListener('mouseenter', () => { hoverDiv.style.display = 'block'; });
+        posterDiv.addEventListener('mouseleave', () => { hoverDiv.style.display = 'none'; });
+        container.appendChild(card);
+      });
+      loadedCount += nextBatch.length;
+      isLoading = false;
+    }
+
+    function handleInfiniteScroll() {
+      if (isLoading) return;
+      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 120)) {
+        if (loadedCount < filteredData.length) {
+          isLoading = true;
+          setTimeout(() => renderMovieCards(false), 100);
+        }
+      }
+    }
+
+    document.getElementById('movie-search-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      searchTerm = document.getElementById('movie-search-input').value;
+      applyFiltersAndRender(true);
+    });
+    document.querySelectorAll('.sort-radio').forEach(radio => {
+      radio.addEventListener('change', function() {
+        sortType = this.value;
+        applyFiltersAndRender(true);
+      });
+    });
+    window.addEventListener('scroll', handleInfiniteScroll);
+    document.getElementById('sort-movie1').checked = true;
+    loadMoviesFromJson();
+  </script>
+</body>
+
+</html>
