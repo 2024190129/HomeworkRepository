@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1020">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <title>Movie Site</title>
+</head>
+
+<body>
+  <header class="top-header">
+    <div class="header-text">인프밍 영화 정보 사이트입니다.</div>
+    <nav class="navigation-bar">
+        <a href="index.html" class="nav-link active">메인페이지</a>
+        <a href="login.html" class="nav-link">로그인</a>
+        <a href="signup.html" class="nav-link">회원가입</a>
+    </nav>
+  </header>
+  <hr class="indicator-line">
+  <div class="container">
+    <div class="search-bar-row">
+      <form id="movie-search-form" style="border:none;background:none;box-shadow:none;padding:0;margin:0;">
+        <input id="movie-search-input" type="text" placeholder="키워드를 입력하세요." />
+        <button id="movie-search-btn" type="submit">Filter results</button>
+      </form>
+    </div>
+    <div class="main-content-row">
+      <aside class="sidebar">
+        <div style="border:1px solid #aaa; border-radius:6px; padding:18px 16px; background:#fafafa;">
+          <div style="font-weight:bold; margin-bottom:10px;">정렬 기준</div>
+          <div style="margin-bottom:8px;"><input class="sort-radio" type="radio" name="sort-movie" id="sort-movie1" value="rating-desc"><label for="sort-movie1"> 평점 내림차순</label></div>
+          <div style="margin-bottom:8px;"><input class="sort-radio" type="radio" name="sort-movie" id="sort-movie2" value="rating-asc"><label for="sort-movie2"> 평점 오름차순</label></div>
+          <div style="margin-bottom:8px;"><input class="sort-radio" type="radio" name="sort-movie" id="sort-movie3" value="release-desc"><label for="sort-movie3"> 개봉 내림차순</label></div>
+          <div><input class="sort-radio" type="radio" name="sort-movie" id="sort-movie4" value="release-asc"><label for="sort-movie4"> 개봉 오름차순</label></div>
+        </div>
+      </aside>
+      <main style="flex:1;">
+        <h2 style="margin-bottom:16px;">Movies</h2>
+        <div id="movie-list" class="movie-list">
+        </div>
+      </main>
+    </div>
+    <div class="about-section" style="margin-top:40px;">
+      <h3>About</h3>
+      <hr>
+      <div class="about">여기는 인프밍 영화정보 사이트!<br>영화 정보, 검색, 정렬, 필터링 기능을 제공합니다.</div>
+    </div>
+  </div>
+  <script>
+    let movieData = [];
+    let loadedCount = 0;
+    const BATCH_SIZE = 6;
+    let searchTerm = '';
+    let sortType = 'rating-desc';
+    let isLoading = false;
+
+    async function loadMoviesFromAPI() {
+      try {
+        const params = new URLSearchParams();
+        if (searchTerm) params.append('keyword', searchTerm);
+        if (sortType) params.append('sort', sortType);
+        
+        const response = await fetch(`/movies?${params.toString()}`);
+        const movies = await response.json();
+        movieData = movies;
+        loadedCount = 0;
+        renderMovieCards(true);
+      } catch (err) {
+        document.getElementById('movie-list').innerHTML = '<div>영화 데이터를 불러올 수 없습니다.</div>';
+        console.log('Failed to load movies:', err);
+      }
+    }
+
+    function renderMovieCards(reset = false) {
+      const container = document.getElementById('movie-list');
+      if (reset) container.innerHTML = '';
+      const nextBatch = movieData.slice(loadedCount, loadedCount + BATCH_SIZE);
+      nextBatch.forEach(movie => {
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+          <div class="poster" style="position:relative; width:100%; height:320px;">
+            <img src="${movie.movie_image}" alt="${movie.movie_title}" style="width:100%; height:100%; object-fit:cover; display:block;">
+          </div>
+          <div style="padding:12px 10px 10px 10px;">
+            <div style="font-weight:bold; font-size:18px;">${movie.movie_title}</div>
+            <div style="color:#555; font-size:14px; margin:4px 0 2px 0;">📅 ${movie.movie_release_date}</div>
+            <div style="color:#f5b50a; font-size:14px;">⭐ ${movie.movie_rate}/10</div>
+          </div>
+        `;
+        
+        card.addEventListener('click', () => {
+          window.location.href = `movie.html?movie_id=${movie.movie_id}`;
+        });
+        
+        container.appendChild(card);
+      });
+      loadedCount += nextBatch.length;
+      isLoading = false;
+    }
+
+    function handleInfiniteScroll() {
+      if (isLoading) return;
+      if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 120)) {
+        if (loadedCount < movieData.length) {
+          isLoading = true;
+          setTimeout(() => renderMovieCards(false), 100);
+        }
+      }
+    }
+
+    document.getElementById('movie-search-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      searchTerm = document.getElementById('movie-search-input').value;
+      loadMoviesFromAPI();
+    });
+
+    document.querySelectorAll('.sort-radio').forEach(radio => {
+      radio.addEventListener('change', function() {
+        sortType = this.value;
+        loadMoviesFromAPI();
+      });
+    });
+
+    window.addEventListener('scroll', handleInfiniteScroll);
+    document.getElementById('sort-movie1').checked = true;
+    loadMoviesFromAPI();
+  </script>
+</body>
+
+</html>

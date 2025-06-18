@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1020">
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <title>Movie Site - 영화 상세정보</title>
+</head>
+<body>
+  <header class="top-header">
+    <div class="header-text">인프밍 영화 정보 사이트입니다.</div>
+    <nav class="navigation-bar">
+        <a href="index.html" class="nav-link">메인페이지</a>
+        <a href="login.html" class="nav-link">로그인</a>
+        <a href="signup.html" class="nav-link">회원가입</a>
+    </nav>
+  </header>
+  <hr class="indicator-line">
+  
+  <div class="container">
+    <h2 style="margin-bottom:16px;">영화 상세 정보</h2>
+    <div id="movie-details-container"></div>
+    
+    <div style="margin-top:40px; width:100%; max-width:none;">
+      <div style="display:flex; align-items:center; margin-bottom:25px; padding-bottom:15px; border-bottom:2px solid #f0f0f0;">
+        <span style="font-size:24px; margin-right:10px;">💬</span>
+        <h3 style="margin:0; color:#333; font-size:22px;">영화 후기</h3>
+      </div>
+      
+      <form id="review-submission-form" style="margin-bottom:30px; width:100%; border: none;">
+        <div style="margin-bottom:15px; width:100%;">
+          <label style="display:block; margin-bottom:10px; font-weight:600; color:#333; font-size:16px;">💭 새 후기 작성</label>
+          <textarea id="review-input-field" placeholder="이 영화에 대한 솔직한 후기를 남겨주세요. 스포일러는 자제해주세요!" required 
+            style="width:100%; min-height:120px; max-height:300px; padding:16px; border:none; border-radius:12px; font-family:inherit; font-size:15px; line-height:1.5; resize:vertical; box-sizing:border-box; background:#f8f9fa; transition:background 0.3s ease;" 
+            rows="5"
+            onfocus="this.style.background='#e9ecef'"
+            onblur="this.style.background='#f8f9fa'"></textarea>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+          <div style="color:#6c757d; font-size:14px;">
+            <span id="char-count">0</span>/500자
+          </div>
+          <button type="submit" style="padding:12px 32px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600; font-size:15px; transition:all 0.3s ease;" 
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(102, 126, 234, 0.3)'" 
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            ✍️ 후기 등록
+          </button>
+        </div>
+      </form>
+      
+      <div id="reviews-display-area" style="width:100%; margin-bottom: 80px;"></div>
+    </div>
+  </div>
+
+  <script>
+    let selectedMovieId = null;
+
+    function updateCharCount() {
+      const textarea = document.getElementById("review-input-field");
+      const charCount = document.getElementById("char-count");
+      const currentLength = textarea.value.length;
+      charCount.textContent = currentLength;
+      
+      if (currentLength > 450) {
+        charCount.style.color = '#e74c3c';
+      } else if (currentLength > 400) {
+        charCount.style.color = '#f39c12';
+      } else {
+        charCount.style.color = '#6c757d';
+      }
+      
+      if (currentLength > 500) {
+        textarea.value = textarea.value.substring(0, 500);
+        charCount.textContent = '500';
+      }
+    }
+
+    async function loadMovieDetails() {
+      const urlParams = new URLSearchParams(window.location.search);
+      selectedMovieId = urlParams.get("movie_id");
+      
+      if (!selectedMovieId) {
+        document.getElementById("movie-details-container").innerHTML = '<div>영화 정보를 찾을 수 없습니다.</div>';
+        return;
+      }
+
+      try {
+        const movieResponse = await fetch(`/movies/${selectedMovieId}`);
+        const movieInfo = await movieResponse.json();
+
+        document.getElementById("movie-details-container").innerHTML = `
+          <div style="display:flex; gap:30px; margin-bottom:20px; background:#ffffff; padding:25px; border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+            <img src="${movieInfo.movie_image}" alt="${movieInfo.movie_title}" style="width:300px; height:450px; object-fit:cover; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.15);" />
+            <div style="flex:1;">
+              <h1 style="font-size:32px; margin-bottom:20px; color:#2c3e50; line-height:1.2;">🎬 ${movieInfo.movie_title}</h1>
+              <div style="background:#f8f9fa; padding:20px; border-radius:8px; margin-bottom:15px;">
+                <p style="margin:0 0 12px 0; font-size:16px;"><span style="font-weight:600; color:#495057;">영화 ID:</span> <span style="color:#6c757d;">${movieInfo.movie_id}</span></p>
+                <p style="margin:0 0 12px 0; font-size:16px;"><span style="font-weight:600; color:#495057;">📅 개봉일:</span> <span style="color:#6c757d;">${movieInfo.movie_release_date}</span></p>
+                <p style="margin:0; font-size:16px;"><span style="font-weight:600; color:#495057;">⭐ 평점:</span> <span style="color:#f39c12; font-weight:600;">${movieInfo.movie_rate}/10</span></p>
+              </div>
+              <div>
+                <h4 style="margin:0 0 12px 0; font-size:18px; color:#495057;">📖 줄거리</h4>
+                <p style="line-height:1.8; color:#6c757d; font-size:15px; margin:0;">${movieInfo.movie_overview}</p>
+              </div>
+            </div>
+          </div>
+        `;
+
+        await displayMovieReviews();
+      } catch (error) {
+        console.log("Movie data loading failed:", error);
+        document.getElementById("movie-details-container").innerHTML = '<div>영화 정보를 불러오는데 실패했습니다.</div>';
+      }
+    }
+
+    async function displayMovieReviews() {
+      try {
+        const reviewsResponse = await fetch(`/comments/${selectedMovieId}`);
+        const reviewsList = await reviewsResponse.json();
+
+        const reviewsContainer = document.getElementById("reviews-display-area");
+        
+        if (reviewsList.length === 0) {
+          reviewsContainer.innerHTML = `
+            <div style="text-align:center; padding:40px 20px; color:#6c757d;">
+              <div style="font-size:48px; margin-bottom:16px; opacity:0.5;">💭</div>
+              <p style="margin:0; font-size:16px;">아직 등록된 후기가 없습니다.</p>
+              <p style="margin:8px 0 0 0; font-size:14px; opacity:0.8;">첫 번째 후기를 남겨보세요!</p>
+            </div>
+          `;
+        } else {
+          reviewsContainer.innerHTML = `
+            <div style="margin-bottom:20px; padding:12px 16px; background:#f8f9fa; border-radius:8px; border-left:4px solid #667eea;">
+              <span style="color:#495057; font-weight:600; font-size:16px;">📋 총 ${reviewsList.length}개의 후기</span>
+            </div>
+            <div style="space-y:12px;">
+              ${reviewsList.map((review, index) => `
+                <div style="background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); margin-bottom:16px; padding:24px; border-radius:12px; border-left:4px solid #667eea; box-shadow:0 2px 8px rgba(0,0,0,0.08); transition:all 0.3s ease;" 
+                  onmouseover="this.style.transform='translateX(8px)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.12)'" 
+                  onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'">
+                  <p style="margin:0; line-height:1.7; color:#495057; font-size:15px; white-space:pre-wrap;">${review}</p>
+                </div>
+              `).join("")}
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.log("Reviews loading error:", error);
+        document.getElementById("reviews-display-area").innerHTML = '<div>후기를 불러오는데 실패했습니다.</div>';
+      }
+    }
+
+    async function handleReviewSubmission(event) {
+      event.preventDefault();
+      
+      const reviewInputElement = document.getElementById("review-input-field");
+      const reviewText = reviewInputElement.value.trim();
+      
+      if (!reviewText) {
+        alert("후기 내용을 입력해주세요.");
+        return;
+      }
+
+      if (reviewText.length > 500) {
+        alert("후기는 500자 이내로 작성해주세요.");
+        return;
+      }
+
+      try {
+        const submitResponse = await fetch("/comments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            movie_id: selectedMovieId, 
+            comment: reviewText 
+          })
+        });
+
+        if (submitResponse.ok) {
+          reviewInputElement.value = "";
+          updateCharCount();
+          await displayMovieReviews();
+          
+          const successMessage = document.createElement('div');
+          successMessage.style.cssText = 'position:fixed; top:20px; right:20px; background:#28a745; color:white; padding:16px 24px; border-radius:8px; z-index:1000; animation:slideIn 0.3s ease-out; font-weight:500; box-shadow:0 4px 12px rgba(40, 167, 69, 0.3);';
+          successMessage.innerHTML = '✅ 후기가 성공적으로 등록되었습니다!';
+          document.body.appendChild(successMessage);
+          
+          setTimeout(() => {
+            document.body.removeChild(successMessage);
+          }, 3000);
+        } else {
+          alert("후기 등록에 실패했습니다. 다시 시도해주세요.");
+        }
+      } catch (error) {
+        console.log("Review submission error:", error);
+        alert("후기 등록 중 오류가 발생했습니다.");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadMovieDetails();
+      document.getElementById("review-submission-form").addEventListener("submit", handleReviewSubmission);
+      document.getElementById("review-input-field").addEventListener("input", updateCharCount);
+    });
+  </script>
+
+  <style>
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</body>
+</html>
